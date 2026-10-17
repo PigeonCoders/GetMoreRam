@@ -370,10 +370,10 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		4E9544CF30558D4400540EF8 /* XCRemoteSwiftPackageReference "StosSign" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/stossy11/StosSign";
+			repositoryURL = "https://github.com/failury/StosSign";
 			requirement = {
-				branch = main;
-				kind = branch;
+				revision = 56479ccad9b45bcb81ee761d019e64c46ab392f8;
+				kind = revision;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

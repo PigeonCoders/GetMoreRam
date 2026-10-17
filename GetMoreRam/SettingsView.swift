@@ -60,7 +60,24 @@ struct SettingsView: View {
                     TextField("", text: $sharedModel.anisetteServerURL)
                         .multilineTextAlignment(.trailing)
                 }
+                TextField("Client Info", text: $sharedModel.authenticationClientInfo, axis: .vertical)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .accessibilityLabel("Client Info")
+                TextField("User Agent", text: $sharedModel.authenticationUserAgent, axis: .vertical)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .accessibilityLabel("User Agent")
+                Button("Use Windows / iTunes Settings") {
+                    sharedModel.authenticationClientInfo = AuthenticationConfiguration.defaultClientInfo
+                    sharedModel.authenticationUserAgent = AuthenticationConfiguration.defaultUserAgent
+                }
+            } header: {
+                Text("Authentication")
+            } footer: {
+                Text("These saved headers are used for anisette provisioning, Apple ID sign-in, and two-factor verification. The defaults match your SideStore Windows / iTunes configuration. Sign out and sign in again to apply changes to an existing session.")
             }
+            .disabled(viewModel.isLoginInProgress || sharedModel.isLogin)
             
             Section {
                 Button("Clean Up Keychain") {
