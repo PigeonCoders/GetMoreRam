@@ -83,14 +83,30 @@ extension String: @retroactive LocalizedError {
 }
 
 class SharedModel: ObservableObject {
+    static let defaultAnisetteServerURL = "https://win.ani.sidestore.io"
+    private static let anisetteMigrationKey = "GetMoreRam.didMigrateToWindowsADIV1"
+
     @Published var isLogin = false
-    @AppStorage("AnisetteServer") var anisetteServerURL = "https://ani.sidestore.io"
+    @AppStorage("AnisetteServer") var anisetteServerURL = SharedModel.defaultAnisetteServerURL
     var session: AppleAPISession?
     var account: Account?
     var team: Team?
-    
+
     init() {
-        AnisetteDataHelper.shared.url = URL(string: anisetteServerURL)
+        let defaults = UserDefaults.standard
+        let serverKey = "AnisetteServer"
+
+        // Old builds sent a macOS/iTunes-mismatched identity to GSA. Move the stored
+        // server and drop the old adi.pb once; the next sign-in provisions a fresh one.
+        if !defaults.bool(forKey: Self.anisetteMigrationKey) {
+            defaults.set(Self.defaultAnisetteServerURL, forKey: serverKey)
+            Keychain.shared.adiPb = nil
+            AnisetteDataHelper.shared.resetClientInfo()
+            defaults.set(true, forKey: Self.anisetteMigrationKey)
+        }
+
+        let resolvedServer = defaults.string(forKey: serverKey) ?? Self.defaultAnisetteServerURL
+        AnisetteDataHelper.shared.url = URL(string: resolvedServer)
     }
 }
 

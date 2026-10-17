@@ -346,9 +346,11 @@ final class AnisetteDataHelper
         }
         
         self.printOut("Using custom client_info")
-                        
-        self.clientInfo = "<iMac18,3> <macOS;27.0;26A5378j> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
-        self.userAgent = "AuthKit/1 (Macintosh; OS X 27.0) (com.apple.akd/1.0)"
+
+        // GSA now rejects the old macOS identity with HTTP 503. Windows/iTunes is
+        // currently accepted and matches the Windows ADI anisette server.
+        self.clientInfo = "<PC> <Windows;6.2(0,0);9200> <com.apple.AuthKit/1 (com.apple.iTunes/12.12.4.1)>"
+        self.userAgent = "akd/1.0 CFNetwork/808.1.4"
         self.printOut("Client-Info: \(self.clientInfo!)")
         self.printOut("User-Agent: \(self.userAgent!)")
         
