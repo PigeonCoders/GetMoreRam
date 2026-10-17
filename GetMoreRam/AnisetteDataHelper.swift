@@ -41,7 +41,12 @@ final class AnisetteDataHelper
     
     func getAnisetteData(refresh: Bool = false) async throws -> AnisetteData
     {
-        
+        if refresh {
+            // A new OTP must be provisioned; the old adi.pb is tied to the consumed one.
+            Keychain.shared.adiPb = nil
+            self.resetClientInfo()
+        }
+
         if url == nil {
             throw "No Anisette Server Found!"
         }

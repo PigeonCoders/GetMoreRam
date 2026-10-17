@@ -77,33 +77,50 @@ class LoginViewModel: ObservableObject {
         }
 
         do {
-            let anisetteData = try await AnisetteDataHelper.shared.getAnisetteData()
-
-            let (account, session) = try await AppleAPI.shared.authenticate(appleID: appleID, password: password, anisetteData: anisetteData) { [weak self] completionHandler in
-                guard let self else {
-                    completionHandler(nil)
-                    return
+            // An OTP is single-use. If the user takes a while at the 2FA prompt, the
+            // post-2FA request can come back as invalidAnisetteData (-22421). Retry
+            // the whole flow once with a freshly provisioned adi.pb.
+            for attempt in 0...1 {
+                if attempt > 0 {
+                    logging(text: "Anisette data invalid; retrying with fresh data...")
                 }
 
-                self.prepareForVerification(using: completionHandler)
+                let anisetteData = try await AnisetteDataHelper.shared.getAnisetteData(refresh: attempt > 0)
+
+                do {
+                    let (account, session) = try await AppleAPI.shared.authenticate(appleID: appleID, password: password, anisetteData: anisetteData) { [weak self] completionHandler in
+                        guard let self else {
+                            completionHandler(nil)
+                            return
+                        }
+
+                        self.prepareForVerification(using: completionHandler)
+                    }
+
+                    guard !isAuthenticationCancellationRequested else {
+                        throw CancellationError()
+                    }
+
+                    logging(text: "Successfully signed in")
+
+                    DataManager.shared.model.account = account
+                    DataManager.shared.model.session = session
+                    Keychain.shared.appleIDEmailAddress = appleID
+                    Keychain.shared.appleIDPassword = password
+
+                    let teams = try await fetchTeams(for: account, session: session)
+                    logging(text: "Successfully fetched teams")
+                    availableTeams = teams
+
+                    return true
+                } catch is CancellationError {
+                    throw CancellationError()
+                } catch let error as AppleAPIError where error == .invalidAnisetteData && attempt == 0 {
+                    continue
+                }
             }
 
-            guard !isAuthenticationCancellationRequested else {
-                throw CancellationError()
-            }
-
-            logging(text: "Successfully signed in")
-
-            DataManager.shared.model.account = account
-            DataManager.shared.model.session = session
-            Keychain.shared.appleIDEmailAddress = appleID
-            Keychain.shared.appleIDPassword = password
-
-            let teams = try await fetchTeams(for: account, session: session)
-            logging(text: "Successfully fetched teams")
-            availableTeams = teams
-
-            return true
+            throw AppleAPIError.invalidAnisetteData
         } catch {
             if isAuthenticationCancellationRequested {
                 throw CancellationError()
