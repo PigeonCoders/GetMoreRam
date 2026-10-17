@@ -60,14 +60,20 @@ struct SettingsView: View {
                     TextField("", text: $sharedModel.anisetteServerURL)
                         .multilineTextAlignment(.trailing)
                 }
-                TextField("Client Info", text: $sharedModel.authenticationClientInfo, axis: .vertical)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .accessibilityLabel("Client Info")
-                TextField("User Agent", text: $sharedModel.authenticationUserAgent, axis: .vertical)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .accessibilityLabel("User Agent")
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Client Info").font(.caption).foregroundStyle(.secondary)
+                    TextField("Client Info", text: $sharedModel.authenticationClientInfo, axis: .vertical)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .accessibilityLabel("Client Info")
+                }
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("User Agent").font(.caption).foregroundStyle(.secondary)
+                    TextField("User Agent", text: $sharedModel.authenticationUserAgent, axis: .vertical)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .accessibilityLabel("User Agent")
+                }
                 Button("Use Windows / iTunes Settings") {
                     sharedModel.authenticationClientInfo = AuthenticationConfiguration.defaultClientInfo
                     sharedModel.authenticationUserAgent = AuthenticationConfiguration.defaultUserAgent
