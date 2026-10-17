@@ -42,8 +42,9 @@ final class AnisetteDataHelper
     func getAnisetteData(refresh: Bool = false) async throws -> AnisetteData
     {
         if refresh {
-            // A new OTP must be provisioned; the old adi.pb is tied to the consumed one.
-            Keychain.shared.adiPb = nil
+            // Keep the existing adi.pb: /v3/get_headers issues a fresh OTP on every
+            // call, so we do not need to re-provision just to get new headers.
+            // Re-provision only when the server reports -45061.
             self.resetClientInfo()
         }
 
@@ -286,14 +287,16 @@ final class AnisetteDataHelper
         request.httpMethod = "POST"
         request.httpBody = try PropertyListSerialization.data(fromPropertyList: body, format: .xml, options: 0)
         
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
         if let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? Dictionary<String, Dictionary<String, Any>>,
            let ptm = plist["Response"]?["ptm"] as? String,
            let tk = plist["Response"]?["tk"] as? String {
             return ["ptm": ptm, "tk": tk]
         } else {
-            self.printOut("Apple didn't give valid end provisioning data! Got response: \(String(data: data, encoding: .utf8) ?? "not utf8")")
-            throw "Apple didn't give valid end provisioning data. Please try again later"
+            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+            let body = String(data: data, encoding: .utf8) ?? "not utf8"
+            self.printOut("Apple didn't give valid end provisioning data! Got response: \(body)")
+            throw "Apple didn't give valid end provisioning data (HTTP \(status)). Please try again later: \(body.prefix(240))"
         }
     }
     
