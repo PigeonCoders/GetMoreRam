@@ -88,15 +88,11 @@ final class AnisetteDataHelper
                 formattedJSON["deviceDescription"] = self.clientInfo!
                 formattedJSON["localUserID"] = self.mdLu!
                 formattedJSON["deviceUniqueIdentifier"] = self.deviceId!
-                
-                // Generate date stuff on client
-                let formatter = DateFormatter()
-                formatter.locale = Locale(identifier: "en_US_POSIX")
-                formatter.calendar = Calendar(identifier: .gregorian)
-                formatter.timeZone = TimeZone.current
-                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-                let dateString = formatter.string(from: Date())
-                formattedJSON["date"] = dateString
+
+                // Generate date stuff on client. GSA validates this timestamp, so it must
+                // be UTC: local time with a literal "Z" suffix is a timezone skew and
+                // produces -22421 ("invalid or expired anisette data").
+                formattedJSON["date"] = ISO8601DateFormatter().string(from: Date())
                 formattedJSON["locale"] = Locale.current.identifier
                 formattedJSON["timeZone"] = TimeZone.current.abbreviation()
             } else {
