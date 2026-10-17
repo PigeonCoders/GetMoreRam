@@ -12,7 +12,11 @@ User Agent: akd/1.0 CFNetwork/808.1.4
 
 Both values are editable and saved under **Settings → Authentication**. They apply to anisette provisioning, GrandSlam sign-in (including the app-token request), and trusted-device/SMS two-factor requests. Changes take effect on the next sign-in. The server URL is also reread on each sign-in. Developer Services retains StosSign's existing Xcode user agent.
 
-The pinned [StosSign authentication patch](https://github.com/failury/StosSign/commit/56479ccad9b45bcb81ee761d019e64c46ab392f8) adds an optional user-agent override and retains the original defaults for other clients. GetMoreRam's `INCREASED_MEMORY_LIMIT` capability operation is unchanged. Authentication diagnostics omit raw anisette secrets, and generated timestamps use UTC.
+The pinned [StosSign authentication patch](https://github.com/failury/StosSign/commit/c868b2bbfee86eec11d6dba65b3e09a2f2ecd90b) adds an optional user-agent override and retains the original defaults for other clients. GetMoreRam's `INCREASED_MEMORY_LIMIT` capability operation is unchanged. Authentication diagnostics omit raw anisette secrets, and generated timestamps use UTC.
+
+Version 1.1 handles Apple's automatically pushed 2FA challenge (`hsc=409` with missing or empty `au`), following [SideSign's fix](https://github.com/SideStore/SideSign/pull/5). Previously this response was mistaken for completed authentication, so the developer-token request could fail with `-22411` before code entry. The app now waits for the code already sent, skips requesting a replacement, refreshes anisette before trusted-device validation and reauthentication, and limits the flow to one 2FA retry. The [AltSign implementation discussion](https://github.com/rileytestut/AltSign/pull/59) documents the same failure sequence. Genuine `-22411` errors are still errors; the app only takes this path when the password response identifies a challenge.
+
+Seven offline tests cover header overrides, legacy and pushed-code routing, code-entry/refresh/validation order, and cancellation. Apple sign-in and capability registration still require an on-device test. Safe stage messages in the login's Debugging section identify where any remaining failure occurs.
 
 ### Download and install
 

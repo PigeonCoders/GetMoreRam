@@ -143,7 +143,11 @@ struct SettingsView: View {
                 }
                 if viewModel.needVerificationCode {
                     Section {
+                        Text("Enter the code Apple sent to your trusted device.")
+                            .font(.footnote)
                         TextField("", text: $viewModel.verificationCode)
+                            .keyboardType(.numberPad)
+                            .textContentType(.oneTimeCode)
                             .disabled(viewModel.isVerificationCodeSubmitting)
                     } header: {
                         Text("Verification Code")
