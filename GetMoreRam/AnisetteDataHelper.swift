@@ -29,7 +29,12 @@ final class AnisetteDataHelper
     var menuAnisetteURL: String?
     
     static var shared: AnisetteDataHelper = AnisetteDataHelper()
-    
+
+    // AnisetteKit / SideStore use this placeholder local user ID. GSA validates the
+    // ADI headers, and the old SHA-256(identifier) value is rejected with -22421
+    // once the Windows/iTunes client identity is used.
+    static let defaultLocalUserID = "0000000000000000000000000000000000000000000000000000000000000001"
+
     var loggingFunc: ((String)->Void)?
 
     private var configuredClientInfo = AuthenticationConfiguration.defaultClientInfo
@@ -376,7 +381,7 @@ final class AnisetteDataHelper
         }
         
         let decoded = Data(base64Encoded: Keychain.shared.identifier!)!
-        self.mdLu = decoded.sha256().hexEncodedString()
+        self.mdLu = Self.defaultLocalUserID
         self.printOut("X-Apple-I-MD-LU: \(self.mdLu!)")
         let uuid: UUID = decoded.object()
         self.deviceId = uuid.uuidString.uppercased()
@@ -414,7 +419,7 @@ final class AnisetteDataHelper
                         }
                         
                         let decoded = Data(base64Encoded: Keychain.shared.identifier!)!
-                        self.mdLu = decoded.sha256().hexEncodedString()
+                        self.mdLu = Self.defaultLocalUserID
                         self.printOut("X-Apple-I-MD-LU: \(self.mdLu!)")
                         let uuid: UUID = decoded.object()
                         self.deviceId = uuid.uuidString.uppercased()
