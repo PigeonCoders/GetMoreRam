@@ -112,14 +112,17 @@ class SharedModel: ObservableObject {
         }
 
         var clientInfo = ud.string(forKey: "AuthenticationClientInfo") ?? AuthenticationConfiguration.defaultClientInfo
-        if clientInfo.contains("Windows;") ||
+        if clientInfo.contains("Mac OS X;10.12") ||
+            clientInfo.contains("macOS;13.1") ||
+            clientInfo.contains("Windows;") ||
             clientInfo.contains("com.apple.iTunes") ||
-            clientInfo.contains("macOS;") {
+            clientInfo.contains("com.apple.dt.Xcode") {
             clientInfo = AuthenticationConfiguration.defaultClientInfo
         }
 
         var userAgent = ud.string(forKey: "AuthenticationUserAgent") ?? AuthenticationConfiguration.defaultUserAgent
         if userAgent.contains("CFNetwork/808.1.4") ||
+            userAgent.contains("CFNetwork/811.5.4 Darwin/16.7.0") ||
             userAgent.contains("com.apple.dt.Xcode") {
             userAgent = AuthenticationConfiguration.defaultUserAgent
         }

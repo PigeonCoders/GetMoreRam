@@ -7,10 +7,10 @@ func expectInvalid(_ server: String = "https://new.ani.sidestore.io", client: St
     } catch {}
 }
 
-let config = try AuthenticationConfiguration(server: " https://new.ani.sidestore.io/ ", clientInfo: AuthenticationConfiguration.defaultClientInfo, userAgent: " akd/1.0 CFNetwork/811.5.4 Darwin/16.7.0 ")
+let config = try AuthenticationConfiguration(server: " https://new.ani.sidestore.io/ ", clientInfo: AuthenticationConfiguration.defaultClientInfo, userAgent: " AuthKit/1 (Macintosh; OS X 26.6) (com.apple.akd/1.0) ")
 precondition(config.serverURL.absoluteString == "https://new.ani.sidestore.io/")
-precondition(config.clientInfo == "<MacBookPro13,3> <Mac OS X;10.12.6;16G29> <com.apple.AuthKit/1 (com.apple.akd/1.0)>")
-precondition(config.userAgent == "akd/1.0 CFNetwork/811.5.4 Darwin/16.7.0")
+precondition(config.clientInfo == "<MacBookPro18,3> <macOS;26.6;25F84> <com.apple.AuthKit/1 (com.apple.akd/1.0)>")
+precondition(config.userAgent == "AuthKit/1 (Macintosh; OS X 26.6) (com.apple.akd/1.0)")
 expectInvalid("ftp://example.com")
 expectInvalid("https://")
 expectInvalid("https://user:password@example.com")
