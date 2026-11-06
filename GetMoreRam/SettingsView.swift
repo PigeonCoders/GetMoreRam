@@ -74,14 +74,14 @@ struct SettingsView: View {
                         .autocorrectionDisabled()
                         .accessibilityLabel("User Agent")
                 }
-                Button("Use Windows / iTunes Settings") {
+                Button("Use SideStore (New) Settings") {
                     sharedModel.authenticationClientInfo = AuthenticationConfiguration.defaultClientInfo
                     sharedModel.authenticationUserAgent = AuthenticationConfiguration.defaultUserAgent
                 }
             } header: {
                 Text("Authentication")
             } footer: {
-                Text("These saved headers are used for anisette provisioning, Apple ID sign-in, and two-factor verification. The defaults match your SideStore Windows / iTunes configuration. Sign out and sign in again to apply changes to an existing session.")
+                Text("These saved headers are used for anisette provisioning, Apple ID sign-in, and two-factor verification. The defaults match the current SideStore (New) anisette profile. Sign out and sign in again to apply changes to an existing session.")
             }
             .disabled(viewModel.isLoginInProgress || sharedModel.isLogin)
             

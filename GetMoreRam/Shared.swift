@@ -98,9 +98,35 @@ class SharedModel: ObservableObject {
     var team: Team?
     
     init() {
-        anisetteServerURL = UserDefaults.standard.string(forKey: "AnisetteServer") ?? "https://ani.sidestore.io"
-        authenticationClientInfo = UserDefaults.standard.string(forKey: "AuthenticationClientInfo") ?? AuthenticationConfiguration.defaultClientInfo
-        authenticationUserAgent = UserDefaults.standard.string(forKey: "AuthenticationUserAgent") ?? AuthenticationConfiguration.defaultUserAgent
+        let ud = UserDefaults.standard
+        let defaultServer = "https://new.ani.sidestore.io"
+
+        // Migrate values saved by earlier builds. win.ani.sidestore.io is now 502 and
+        // the Windows/iTunes identity is rejected by GSA with -22421.
+        var server = ud.string(forKey: "AnisetteServer") ?? defaultServer
+        let isLegacyServer = server.contains("win.ani.sidestore.io") ||
+            server.contains("ani.jkcoxson.com") ||
+            (server.contains("ani.sidestore") && !server.contains("new.ani.sidestore.io"))
+        if isLegacyServer {
+            server = defaultServer
+        }
+
+        var clientInfo = ud.string(forKey: "AuthenticationClientInfo") ?? AuthenticationConfiguration.defaultClientInfo
+        if clientInfo.contains("Windows;") ||
+            clientInfo.contains("com.apple.iTunes") ||
+            clientInfo.contains("macOS;") {
+            clientInfo = AuthenticationConfiguration.defaultClientInfo
+        }
+
+        var userAgent = ud.string(forKey: "AuthenticationUserAgent") ?? AuthenticationConfiguration.defaultUserAgent
+        if userAgent.contains("CFNetwork/808.1.4") ||
+            userAgent.contains("com.apple.dt.Xcode") {
+            userAgent = AuthenticationConfiguration.defaultUserAgent
+        }
+
+        anisetteServerURL = server
+        authenticationClientInfo = clientInfo
+        authenticationUserAgent = userAgent
         AnisetteDataHelper.shared.url = URL(string: anisetteServerURL)
     }
 

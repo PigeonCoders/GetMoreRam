@@ -1,8 +1,8 @@
 import Foundation
 
 struct AuthenticationConfiguration {
-    static let defaultClientInfo = "<PC> <Windows;6.2(0,0);9200> <com.apple.AuthKit/1 (com.apple.iTunes/12.12.4.1)>"
-    static let defaultUserAgent = "akd/1.0 CFNetwork/808.1.4"
+    static let defaultClientInfo = "<MacBookPro13,3> <Mac OS X;10.12.6;16G29> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
+    static let defaultUserAgent = "akd/1.0 CFNetwork/811.5.4 Darwin/16.7.0"
 
     let serverURL: URL
     let clientInfo: String
